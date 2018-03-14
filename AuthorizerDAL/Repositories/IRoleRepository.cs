@@ -26,9 +26,9 @@ namespace AuthorizerDAL.Repositories
         /// <summary>
         /// Remove a Role from database
         /// </summary>
-        /// <param name="user"></param>
+        /// <param name="roleId"></param>
         /// <returns></returns>
-        int Delete(Role role);
+        int Delete(int? id);
 
 
         /// <summary>
@@ -37,13 +37,7 @@ namespace AuthorizerDAL.Repositories
         /// <returns></returns>
         IList<Role> FindAll();
 
-        /// <summary>
-        /// Retrieve role details using rolename
-        /// </summary>
-        /// <param name="roleName"></param>
-        /// <returns></returns>
-        Role GetByRoleName(string roleName);
-
+        Role GetByRoleId(int? id);
 
         /// <summary>
         /// Retrieve page privileges using roleid

@@ -26,16 +26,9 @@ namespace AuthorizerBLL.Services
         /// <summary>
         /// Remove role model
         /// </summary>
-        /// <param name="role"></param>
+        /// <param name="role id"></param>
         /// <returns></returns>
-        int Delete(RoleDTO role);
-
-        /// <summary>
-        /// Retrieve role details using rolename
-        /// </summary>
-        /// <param name="roleName"></param>
-        /// <returns></returns>
-        RoleDTO GetByRoleName(string roleName);
+        int Delete(int? id);
 
         /// <summary>
         /// List all roles
@@ -43,11 +36,6 @@ namespace AuthorizerBLL.Services
         /// <returns></returns>
         IList<RoleDTO> FindAll();
 
-        /// <summary>
-        /// Obtain page priveleges using roleid
-        /// </summary>
-        /// <param name="roleId"></param>
-        /// <returns></returns>
-        RoleDTO GetPagePriveleges(int roleId);
+        RoleDTO GetByRoleId(int? id)
     }
 }

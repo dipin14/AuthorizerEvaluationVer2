@@ -14,6 +14,15 @@ namespace AuthorizerDAL.DatabaseContext
             modelBuilder.HasDefaultSchema("public");
             base.OnModelCreating(modelBuilder);
 
+            modelBuilder.Entity<Role>()
+    .HasMany(rol => rol.Pages)
+    .WithMany(page => page.Roles)
+    .Map(mc =>
+    {
+        mc.ToTable("T_Role_Page");
+        mc.MapLeftKey("roleId");
+        mc.MapRightKey("pageId");
+    });
             modelBuilder.Entity<User>().Property(c => c.userName).HasColumnAnnotation("Index", new IndexAnnotation(new IndexAttribute("US_Name") { IsUnique = true }));
 
             modelBuilder.Entity<Role>().Property(c => c.roleName).HasColumnAnnotation("Index", new IndexAnnotation(new IndexAttribute("RO_Name") { IsUnique = true }));
@@ -21,5 +30,6 @@ namespace AuthorizerDAL.DatabaseContext
 
         public DbSet<User> Users { get; set; }
         public DbSet<Role> Roles { get; set; }
+        public DbSet<Page> Pages { get; set; }
     }
 }

@@ -1,17 +1,20 @@
 ﻿using AuthorizerBLL.Services;
+using AuthorizerDAL.DatabaseContext;
+using AuthorizerDAL.Models;
 using AuthorizerPresentation.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Web;
 using System.Web.Mvc;
 
 namespace AuthorizerPresentation.Controllers
 {
-    [Authorize(Roles ="admin")]
+    //[Authorize(Roles = "admin")]
     public class RoleController : Controller
     {
+        UserDbContext db = new UserDbContext();
+
         private readonly IRoleService _roleService;
 
         public RoleController(IRoleService roleService)
@@ -19,130 +22,192 @@ namespace AuthorizerPresentation.Controllers
             _roleService = roleService;
         }
 
-        /// <summary>
-        /// Retrieves all roles list and displays in grid
-        /// </summary>
-        /// <returns></returns>
         public ActionResult Index()
         {
-            //Mapping RoleDTO list to RoleViewModel list
-            IList<RoleViewModel> roles = _roleService.FindAll().Select(b => new RoleViewModel()
+            var roleProfiles = _roleService.FindAll();/*db.Roles.ToList();*/
+            var roleViewModels = roleProfiles.Select(roleProfile => new RoleViewModel()
             {
-                RoleName = b.RoleName,
-                AccessToPageA = b.AccessToPageA,
-                AccessToPageB = b.AccessToPageB,
-                AccessToPageC = b.AccessToPageC
-            }).ToList();
-            return View(roles);
+                RoleId = roleProfile.RoleId,
+                RoleName = roleProfile.RoleName,
+                pageDetails = roleProfile.Pages.Select(p => new PrivilegeData()
+                {
+                    PageId = p.pageId,
+                    PageName = p.pageName
+                }).ToList()
+            });     
+
+            return View(roleViewModels);
         }
 
         public ActionResult Create()
         {
-            return View();
-        }
+            var roleViewModel = new RoleViewModel { pageDetails = PopulatePageData() };
 
-        /// <summary>
-        /// Creating new Role using RoleViewModel
-        /// </summary>
-        /// <param name="roleView"></param>
-        /// <returns></returns>
-        [HttpPost]
-        public ActionResult Create(RoleViewModel roleView)
-        {
-            if (roleView != null)
-            {
-                roleView.RoleName.Trim();
-                var createResult = _roleService.Create(roleView);
-                if (createResult == -1)
-                {
-                    ModelState.AddModelError("RoleName", "Role Name Already Exists");
-                    return View(roleView);
-                }
-                else if (createResult == 0)
-                {
-                    ViewBag.Message = "Db Creation Error! Please Restart Application";
-                }
-                return RedirectToAction("Index");
-            }
-            else
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-        }
-
-        /// <summary>
-        /// Editing existing role
-        /// </summary>
-        /// <param name="rolename"></param>
-        /// <returns></returns>
-        public ActionResult Edit(string rolename)
-        {
-            if (rolename == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            RoleViewModel roleCollection = _roleService.GetByRoleName(rolename);
-            if (roleCollection == null)
-            {
-                return HttpNotFound();
-            }
-            return View(roleCollection);
+            return View(roleViewModel);
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit(RoleViewModel roleDetails, FormCollection requestValidator)
+        public ActionResult Create(RoleViewModel roleViewModel)
         {
-            try
+            if (ModelState.IsValid)
             {
-                _roleService.Update(roleDetails);
+                var roleProfile = new Role { roleName = roleViewModel.RoleName };
+
+                AddOrUpdatePages(roleProfile, roleViewModel.pageDetails);
+                db.Roles.Add(roleProfile);
+                db.SaveChanges();
+
                 return RedirectToAction("Index");
             }
-            catch
-            {
-                ModelState.AddModelError("RoleName", "Please enter non-existing Role Name");
-                return View(roleDetails);
-            }
+
+            return View(roleViewModel);
         }
 
-        /// <summary>
-        /// Deleting role
-        /// </summary>
-        /// <param name="rolename"></param>
-        /// <returns></returns>
-        public ActionResult Delete(string rolename)
+        public ActionResult Edit(int id = 0)
         {
-            if (rolename == null)
+            // Get all courses
+            var allDbPages = db.Pages.ToList();
+
+            // Get the user we are editing and include the courses already subscribed to
+            var roleProfile = db.Roles.Include("Pages").FirstOrDefault(x => x.roleId == id);
+            RoleViewModel roleViewModel = new RoleViewModel();
+            roleViewModel = roleViewModel.ToViewModel(roleProfile, allDbPages);
+
+            return View(roleViewModel);
+        }
+
+        [HttpPost]
+        public ActionResult Edit(RoleViewModel roleProfileViewModel)
+        {
+            if (ModelState.IsValid)
             {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+
+                var originalRoleProfile = db.Roles.Find(roleProfileViewModel.RoleId);
+                AddOrUpdatePages(originalRoleProfile, roleProfileViewModel.pageDetails);
+                db.Entry(originalRoleProfile).CurrentValues.SetValues(roleProfileViewModel);
+                db.SaveChanges();
+
+                return RedirectToAction("Index");
+            }
+
+            return View(roleProfileViewModel);
+        }
+
+        public ActionResult Details(int id = 0)
+        {
+            // Get all pages
+            var allDbPages = db.Pages.ToList();
+
+            // Get the role we are editing and include the pages it already has access to
+            var roleProfile = db.Roles.Include("Pages").FirstOrDefault(x => x.roleId == id);
+
+            RoleViewModel roleViewModel = new RoleViewModel();
+            roleViewModel = roleViewModel.ToViewModel(roleProfile, allDbPages);
+
+            return View(roleViewModel);
+        }
+
+        public ActionResult Delete(int id = 0)
+        {
+            //var roleProfileIQueryable = from r in db.Roles.Include("Pages")
+            //                            where r.roleId == id
+            //                            select r;
+
+            //if (!roleProfileIQueryable.Any())
+            //{
+            //    return HttpNotFound("Role not found.");
+            //}
+
+            //var roleProfile = roleProfileIQueryable.First();
+            var roleProfile = _roleService.GetByRoleId(id);
+            if (roleProfile == null)
+            {
+                return HttpNotFound("Role not found.");
             }
             else
             {
-                RoleViewModel roleCollection = _roleService.GetByRoleName(rolename);
-                if (HttpContext.User.IsInRole(rolename))
+                RoleViewModel roleProfileViewModel = roleProfile;
+                return View(roleProfileViewModel);
+            }
+            
+        }
+
+        [HttpPost, ActionName("Delete")]
+        public ActionResult DeleteConfirmed(int? id)
+        {
+            //var roleProfile = db.Roles.Include("Pages").Single(r => r.roleId == id);           
+
+            //DeleteRole(roleProfile);
+            _roleService.Delete(id);
+
+            return RedirectToAction("Index");
+        }
+
+        //private void DeleteRole(Role roleProfile)
+        //{
+        //    if (roleProfile.Pages != null)
+        //    {
+        //        foreach (var page in roleProfile.Pages.ToList())
+        //        {
+        //            roleProfile.Pages.Remove(page);
+        //        }
+        //    }
+
+        //    db.Roles.Remove(roleProfile);
+        //    db.SaveChanges();
+        //}
+
+        private void AddOrUpdatePages(Role roleProfile, IEnumerable<PrivilegeData> privilegeAccessed)
+        {
+            if (privilegeAccessed != null)
+            {
+                //Existing user then page privileges already exist so drop existing pages and add new if any
+                if (roleProfile.roleId != 0)
                 {
-                    ViewBag.Error = "Cannot delete your current role";
-                    return View();
+                    foreach (var page in roleProfile.Pages.ToList())
+                    {
+                        roleProfile.Pages.Remove(page);
+                    }
+
+                    foreach (var page in privilegeAccessed.Where(p => p.Access))
+                    {
+                        roleProfile.Pages.Add(db.Pages.Find(page.PageId));
+                    }
                 }
                 else
                 {
-                    return View(roleCollection);
+                    foreach (var pageAccess in privilegeAccessed.Where(p => p.Access))
+                    {
+                        var page = new Page { pageId = pageAccess.PageId };
+                        db.Pages.Attach(page);
+                        roleProfile.Pages.Add(page);
+
+                    }
                 }
             }
-        }
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(RoleViewModel roleDetails, FormCollection requestValidator)
-        {
-            if (roleDetails == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
             else
-            {
-                _roleService.Delete(roleDetails);
-                return RedirectToAction("Index");
-            }
+                return;
         }
+
+        private ICollection<PrivilegeData> PopulatePageData()
+        {
+            UserDbContext entities = new UserDbContext();
+            var pages = entities.Pages;
+            var accessiblePrivileges = new List<PrivilegeData>();
+
+            foreach (var item in pages)
+            {
+                accessiblePrivileges.Add(new PrivilegeData
+                {
+                    PageId = item.pageId,
+                    PageName = item.pageName,
+                    Access = false
+                });
+            }
+
+            return accessiblePrivileges;
+        }
+
+
     }
 }

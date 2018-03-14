@@ -32,18 +32,17 @@ namespace AuthorizerDAL.Repositories
             }
         }
         
-        public int Delete(Role role)
+        public int Delete(int? id)
         {
             try
             {
-                if (role != null)
+                if (id != null)
                 {
-                    Role roleObj = GetByRoleName(role.roleName);
                     using (var db = new UserDbContext())
                     {
-                        db.Roles.Remove(roleObj);
-                        db.SaveChanges();
-                    }
+                        var roleProfile = db.Roles.Include("Pages").Single(r => r.roleId == id);
+                        DeleteRole(roleProfile);
+                    }                    
                     return 1;
                 }
                 return 0;
@@ -62,58 +61,41 @@ namespace AuthorizerDAL.Repositories
                 roleList = db.Roles.ToList();
             }
             return roleList;
-        }        
-        
-        public int Update(Role role)
-        {
-            try
-            {
-                if (role != null)
-                {
-                    using (var db = new UserDbContext())
-                    {
-                        db.Entry(role).State = EntityState.Modified;
-                        db.SaveChanges();
-                    }
-                    return 1;
-                }
-                return 0;
-            }
-            catch(Exception)
-            {
-                return -1;
-            }
         }
                 
-        public Role GetByRoleName(string roleName)
+        public Role GetByRoleId(int? id)
         {
-            try
+            IQueryable<Role> roleProfileIQueryable;
+            using (var db = new UserDbContext())
             {
-                using (var db = new UserDbContext())
-                {
-                    var roleDetails = db.Roles.Where(r => r.roleName == roleName).FirstOrDefault();
-                    return roleDetails;
-                }                
+                roleProfileIQueryable = from r in db.Roles.Include("Pages")
+                                            where r.roleId == id
+                                            select r;
             }
-            catch(Exception)
+
+            if (!roleProfileIQueryable.Any())
             {
-                return null;
+                return null /*HttpNotFound("Role not found.")*/;
             }
+
+            var roleProfile = roleProfileIQueryable.First();
+
+            return roleProfile;
         }
 
-        public Role GetPagePriveleges(int roleId)
+        private void DeleteRole(Role roleProfile)
         {
-            try
+            if (roleProfile.Pages != null)
             {
-                using (var db = new UserDbContext())
+                foreach (var page in roleProfile.Pages.ToList())
                 {
-                    var priveleges = db.Roles.Find(roleId);
-                    return priveleges;
+                    roleProfile.Pages.Remove(page);
                 }
             }
-            catch(Exception)
+            using (var db = new UserDbContext())
             {
-                return null;
+                db.Roles.Remove(roleProfile);
+                db.SaveChanges();
             }
         }
     }

@@ -29,40 +29,30 @@ namespace AuthorizerBLL.Services
             return _iRoleRepository.Update(role);
         }
 
-        public int Delete(RoleDTO role)
+        public int Delete(int? roleId)
         {
-            return _iRoleRepository.Delete(role);
+            return _iRoleRepository.Delete(roleId);
         }
 
-        public IList<RoleDTO> FindAll()
-        {
-            return _iRoleRepository.FindAll().Select(r => new RoleDTO()
-            {
-                RoleId = r.roleId,
-                RoleName = r.roleName,
-                AccessToPageA = r.accessToPageA,
-                AccessToPageB = r.accessToPageB,
-                AccessToPageC = r.accessToPageC
-            }).ToList();
-        }
 
-        public RoleDTO GetByRoleName(string roleName)
+        public RoleDTO GetByRoleId(int? id)
         {
-            if (roleName == null)
-            {
-                return null;
-            }
-            else
-            {
-                //Removes empty spaces if any
-                var checkRoleName = roleName.Trim();
-                return _iRoleRepository.GetByRoleName(checkRoleName);
-            }
+            return _iRoleRepository.GetByRoleId(id);
         }
 
         public RoleDTO GetPagePriveleges(int roleId)
         {
             return _iRoleRepository.GetPagePriveleges(roleId);
+        }
+
+        public IList<RoleDTO> FindAll()
+        {
+
+            return _iRoleRepository.FindAll().Select(roles => new RoleDTO
+            {
+                RoleId = roles.roleId,
+                RoleName = roles.roleName
+            }).ToList(); ;
         }
     }
 }

@@ -11,9 +11,7 @@ namespace Common.DataTransferObjects
     {
         int roleId;
         string roleName;
-        bool accessToPageA;
-        bool accessToPageB;
-        bool accessToPageC;
+        public virtual ICollection<Page> Pages { get; set; }
 
         public int RoleId
         {
@@ -40,46 +38,7 @@ namespace Common.DataTransferObjects
                 roleName = value;
             }
         }
-
-        public bool AccessToPageA
-        {
-            get
-            {
-                return accessToPageA;
-            }
-
-            set
-            {
-                accessToPageA = value;
-            }
-        }
-
-        public bool AccessToPageB
-        {
-            get
-            {
-                return accessToPageB;
-            }
-
-            set
-            {
-                accessToPageB = value;
-            }
-        }
-
-        public bool AccessToPageC
-        {
-            get
-            {
-                return accessToPageC;
-            }
-
-            set
-            {
-                accessToPageC = value;
-            }
-        }
-
+        
         /// <summary>
         /// Implicit Conversion of RoleDTO to Role
         /// </summary>
@@ -91,10 +50,7 @@ namespace Common.DataTransferObjects
                 return new Role
                 {
                     roleId = roleDto.RoleId,
-                    roleName = roleDto.RoleName,
-                    accessToPageA = roleDto.AccessToPageA,
-                    accessToPageB = roleDto.AccessToPageB,
-                    accessToPageC = roleDto.AccessToPageC,
+                    roleName = roleDto.RoleName
                 };
             }
             else
@@ -114,10 +70,7 @@ namespace Common.DataTransferObjects
                 return new RoleDTO
                 {
                     roleId = role.roleId,
-                    roleName = role.roleName,
-                    accessToPageA = role.accessToPageA,
-                    accessToPageB = role.accessToPageB,
-                    accessToPageC = role.accessToPageC
+                    roleName = role.roleName
                 };
             }
             else
@@ -125,5 +78,6 @@ namespace Common.DataTransferObjects
                 return null;
             }
         }
+
     }
 }

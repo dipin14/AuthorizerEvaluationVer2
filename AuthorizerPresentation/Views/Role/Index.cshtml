@@ -1,10 +1,10 @@
 ﻿@model IEnumerable<AuthorizerPresentation.ViewModels.RoleViewModel>
 
 @{
-    ViewBag.Title = "Index";
+    ViewBag.Title = "IndexRoles";
 }
 
-<h2>List Of All Roles</h2>
+<h2>IndexRoles</h2>
 
 <p>
     @Html.ActionLink("Create New", "Create")
@@ -12,16 +12,10 @@
 <table class="table">
     <tr>
         <th>
+            @Html.DisplayNameFor(model => model.RoleId)
+        </th>
+        <th>
             @Html.DisplayNameFor(model => model.RoleName)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.AccessToPageA)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.AccessToPageB)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.AccessToPageC)
         </th>
         <th></th>
     </tr>
@@ -29,20 +23,23 @@
 @foreach (var item in Model) {
     <tr>
         <td>
+            @Html.DisplayFor(modelItem => item.RoleId)
+        </td>
+        <td>
             @Html.DisplayFor(modelItem => item.RoleName)
         </td>
         <td>
-            @Html.DisplayFor(modelItem => item.AccessToPageA)
+            <ul>
+                @foreach (var page in item.pageDetails)
+                {
+                    <li>@page.PageName</li>
+                }
+            </ul>
         </td>
         <td>
-            @Html.DisplayFor(modelItem => item.AccessToPageB)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.AccessToPageC)
-        </td>
-        <td>
-            @Html.ActionLink("Edit", "Edit", new { rolename = item.RoleName }) |
-            @Html.ActionLink("Delete", "Delete", new { rolename = item.RoleName })
+            @Html.ActionLink("Edit", "Edit", new { id=item.RoleId }) |
+            @Html.ActionLink("Details", "Details", new { id = item.RoleId }) |
+            @Html.ActionLink("Delete", "Delete", new { id = item.RoleId })
         </td>
     </tr>
 }

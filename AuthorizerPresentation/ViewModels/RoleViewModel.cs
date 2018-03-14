@@ -1,6 +1,8 @@
-﻿using Common.DataTransferObjects;
+﻿using AuthorizerDAL.Models;
+using Common.DataTransferObjects;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Web;
@@ -11,9 +13,12 @@ namespace AuthorizerPresentation.ViewModels
     {
         int roleId;
         string roleName;
-        bool accessToPageA;
-        bool accessToPageB;
-        bool accessToPageC;
+        public virtual ICollection<PrivilegeData> pageDetails { get; set; }
+
+        public RoleViewModel()
+        {
+            pageDetails = new Collection<PrivilegeData>();
+        }
 
         public int RoleId
         {
@@ -42,48 +47,7 @@ namespace AuthorizerPresentation.ViewModels
             }
         }
 
-        [Display(Name = "Page A")]
-        public bool AccessToPageA
-        {
-            get
-            {
-                return accessToPageA;
-            }
-
-            set
-            {
-                accessToPageA = value;
-            }
-        }
-
-        [Display(Name = "Page B")]
-        public bool AccessToPageB
-        {
-            get
-            {
-                return accessToPageB;
-            }
-
-            set
-            {
-                accessToPageB = value;
-            }
-        }
-
-        [Display(Name = "Page C")]
-        public bool AccessToPageC
-        {
-            get
-            {
-                return accessToPageC;
-            }
-
-            set
-            {
-                accessToPageC = value;
-            }
-        }
-
+        
         public static implicit operator RoleDTO(RoleViewModel role)
         {
             if (role != null)
@@ -91,10 +55,7 @@ namespace AuthorizerPresentation.ViewModels
                 return new RoleDTO
                 {
                     RoleId = role.RoleId,
-                    RoleName = role.RoleName,
-                    AccessToPageA = role.AccessToPageA,
-                    AccessToPageB = role.AccessToPageB,
-                    AccessToPageC = role.AccessToPageC
+                    RoleName = role.RoleName
                 };
             }
             else
@@ -114,10 +75,7 @@ namespace AuthorizerPresentation.ViewModels
                 return new RoleViewModel
                 {
                     RoleId = roleDto.RoleId,
-                    RoleName = roleDto.RoleName,
-                    AccessToPageA = roleDto.AccessToPageA,
-                    AccessToPageB = roleDto.AccessToPageB,
-                    AccessToPageC = roleDto.AccessToPageC
+                    RoleName = roleDto.RoleName
                 };
             }
             else
@@ -125,5 +83,65 @@ namespace AuthorizerPresentation.ViewModels
                 return null;
             }
         }
+
+        public RoleViewModel ToViewModel(Role roleProfile, ICollection<Page> allDbPages)
+        {
+            var roleViewProfile = new RoleViewModel
+            {
+                RoleId = roleProfile.roleId,
+                RoleName = roleProfile.roleName
+            };
+
+            // Collection for full list of pages with roles's already assigned pages included
+            ICollection<PrivilegeData> allPages = new List<PrivilegeData>();
+
+            foreach (var p in allDbPages)
+            {
+                // Create new setPage for each page and set Assigned = true if user already has privilege for page
+                var setPage = new PrivilegeData
+                {
+                    PageId = p.pageId,
+                    Access = roleProfile.Pages.FirstOrDefault(x => x.pageId == p.pageId) != null,
+                    PageName = p.pageName
+                };
+                allPages.Add(setPage);
+            }
+
+
+            roleViewProfile.pageDetails = allPages;
+
+            return roleViewProfile;
+        }
+
+        public static implicit operator RoleViewModel (Role roleProfile)
+        {
+            var roleViewProfile = new RoleViewModel
+            {
+                RoleId = roleProfile.roleId,
+                RoleName = roleProfile.roleName
+            };
+
+            foreach (var page in roleProfile.Pages)
+            {
+                roleViewProfile.pageDetails.Add(new PrivilegeData
+                {
+                    PageId = page.pageId,
+                    PageName = page.pageName,
+                    Access = true
+                });
+            }
+
+            return roleViewProfile;
+        }
+
+
+        public static implicit operator  Role (RoleViewModel roleProfileViewModel)
+        {
+            var roleProfile = new Role();
+            roleProfile.roleName = roleProfileViewModel.RoleName;
+            roleProfile.roleId = roleProfileViewModel.RoleId;
+            return roleProfile;
+        }
+        
     }
 }

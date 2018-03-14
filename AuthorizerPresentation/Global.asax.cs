@@ -2,6 +2,7 @@
 using AuthorizerDAL.DatabaseContext;
 using AuthorizerDAL.Models;
 using AuthorizerDAL.Repositories;
+using AuthorizerPresentation.ViewModels;
 using Autofac;
 using Autofac.Integration.Mvc;
 using System;
@@ -33,6 +34,10 @@ namespace AuthorizerPresentation
             DependencyResolver.SetResolver(new AutofacDependencyResolver(container));
 
             AdminExists();
+
+            MockPagesInitializer();
+
+            
         }
 
         /// <summary>
@@ -52,7 +57,6 @@ namespace AuthorizerPresentation
                 {
                     Role role = new Role();
                     role.roleName = "admin";
-                    role.accessToPageA = role.accessToPageB = role.accessToPageC = true;
                     db.Roles.Add(role);
                     db.SaveChanges();
 
@@ -103,10 +107,26 @@ namespace AuthorizerPresentation
                     }
                     catch (Exception)
                     {
-                        
+
                     }
                 }
             }
         }
+
+
+        public void MockPagesInitializer()
+        {
+            Page pageA = new Page { pageId = 1, pageName = "MockPage A" };
+            Page pageB = new Page { pageId = 2, pageName = "MockPage B" };
+            Page pageC = new Page { pageId = 3, pageName = "MockPage C" };
+            using (UserDbContext entities = new UserDbContext())
+            {
+                entities.Pages.Add(pageA);
+                entities.Pages.Add(pageB);
+                entities.Pages.Add(pageC);
+            }                            
+        }
+
+        
     }
 }

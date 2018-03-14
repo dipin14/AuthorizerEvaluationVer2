@@ -4,61 +4,38 @@
     ViewBag.Title = "Edit";
 }
 
-<h2>Edit Role</h2>
-
+<h2>Edit</h2>
 
 @using (Html.BeginForm())
 {
     @Html.AntiForgeryToken()
     
     <div class="form-horizontal">
-        <h4>Edit Role Details</h4>
+        <h4>RoleViewModel</h4>
         <hr />
-        @Html.HiddenFor(model => model.RoleId)
         @Html.ValidationSummary(true, "", new { @class = "text-danger" })
-        <div class="form-group">
-            @Html.LabelFor(model => model.RoleName, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.EditorFor(model => model.RoleName, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.RoleName, "", new { @class = "text-danger" })
-            </div>
-        </div>
-        <hr />
-        <h5>Enter page access privileges</h5>
+        @Html.HiddenFor(x => x.RoleId)
 
-        <div class="form-group">
-            @Html.Label("Access Page A", htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                <div class="checkbox">
-                    @Html.EditorFor(model => model.AccessToPageA)
-                    @Html.ValidationMessageFor(model => model.AccessToPageA, "", new { @class = "text-danger" })
-                </div>
-            </div>
+        <div>
+            @Html.LabelFor(model => model.RoleId)
+        </div>
+        <div>
+            @Html.DisplayFor(model => model.RoleId)
+        </div>
+        <div>
+            @Html.LabelFor(model => model.RoleName)
+        </div>
+        <div>
+            @Html.EditorFor(model => model.RoleName)
+            @Html.ValidationMessageFor(model => model.RoleName)
         </div>
 
-        <div class="form-group">
-            @Html.Label("Access Page B", htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                <div class="checkbox">
-                    @Html.EditorFor(model => model.AccessToPageB)
-                    @Html.ValidationMessageFor(model => model.AccessToPageB, "", new { @class = "text-danger" })
-                </div>
-            </div>
-        </div>
-
-        <div class="form-group">
-            @Html.Label("Access Page C", htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                <div class="checkbox">
-                    @Html.EditorFor(model => model.AccessToPageC)
-                    @Html.ValidationMessageFor(model => model.AccessToPageC, "", new { @class = "text-danger" })
-                </div>
-            </div>
-        </div>
+        @* Render the check boxes using the Editor Template *@
+        @Html.EditorFor(x => x.pageDetails)
 
         <div class="form-group">
             <div class="col-md-offset-2 col-md-10">
-                <input type="submit" value="Save" class="btn btn-success" />
+                <input type="submit" value="Save" class="btn btn-default" />
             </div>
         </div>
     </div>
@@ -67,7 +44,3 @@
 <div>
     @Html.ActionLink("Back to List", "Index")
 </div>
-
-<script src="~/Scripts/jquery-1.10.2.min.js"></script>
-<script src="~/Scripts/jquery.validate.min.js"></script>
-<script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>

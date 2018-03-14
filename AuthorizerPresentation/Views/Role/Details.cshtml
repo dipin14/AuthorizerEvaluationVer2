@@ -1,0 +1,29 @@
+﻿@model AuthorizerPresentation.ViewModels.RoleViewModel
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Details</h2>
+
+<fieldset>
+    <legend>RoleViewModel</legend>
+
+    <div>
+        @Html.DisplayForModel(Model)
+
+        <p></p>
+
+        @foreach (var page in Model.pageDetails)
+        {
+            <div>
+                <span>@Html.CheckBox("Blah", page.Access, new { disabled = "disabled" })</span>&nbsp;
+                <span>@page.PageName</span>
+            </div>
+        }
+    </div>
+</fieldset>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id = Model.RoleId }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>

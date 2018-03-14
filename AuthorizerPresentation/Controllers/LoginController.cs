@@ -93,9 +93,9 @@ namespace AuthorizerPresentation.Controllers
             var priveleges = _roleService.GetPagePriveleges(loginObj.RoleId);
             if (priveleges != null)
             {
-                Session["PageA"] = priveleges.AccessToPageA;
-                Session["PageB"] = priveleges.AccessToPageB;
-                Session["PageC"] = priveleges.AccessToPageC;
+                Session["PageA"] = true;
+                Session["PageB"] = true;
+                Session["PageC"] = true;
             }
             else
             {

@@ -1,0 +1,8 @@
+﻿@model AuthorizerPresentation.ViewModels.PrivilegeData
+@using AuthorizerPresentation.ViewModels;
+
+<fieldset>
+    @Html.HiddenFor(model => model.PageId)
+    @Html.CheckBoxFor(model => model.Access)
+    @Html.DisplayFor(model => model.PageName)
+</fieldset>
