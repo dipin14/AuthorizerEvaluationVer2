@@ -35,15 +35,25 @@ namespace AuthorizerDAL.Repositories
         /// List all roles
         /// </summary>
         /// <returns></returns>
-        IList<Role> FindAll();
+        IList<Role> FindAllRoles();
+
+        /// <summary>
+        /// List all pages
+        /// </summary>
+        /// <returns></returns>
+        IList<Page> FindAllPages();
 
         Role GetByRoleId(int? id);
+
+        Page GetByPageId(int id);
+
+        void attachPageToPage(Page page);
 
         /// <summary>
         /// Retrieve page privileges using roleid
         /// </summary>
         /// <param name="roleId"></param>
         /// <returns></returns>
-        Role GetPagePriveleges(int roleId);
+        Role FindAndInclude(int roleId);
     }
 }

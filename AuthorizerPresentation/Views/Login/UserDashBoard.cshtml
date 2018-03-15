@@ -1,5 +1,4 @@
-﻿
-@{
+﻿@{
     ViewBag.Title = "DashBoard";
     ViewBag.Name = HttpContext.Current.Session["Username"];
 }
@@ -10,18 +9,21 @@
     <p>Welcome <b>@ViewBag.Name</b></p>
     <p>You have access to</p>
     <ul>
-        @if (Session["PageA"].Equals(true))
+        @try
+        { 
+            foreach (var page in Session["Pages"] as List<string>)
         {
-            <li>@Html.Label("PageA")</li>
+                <li>
+                    <span>@page</span>
+                </li>
+            }
         }
-        @if (Session["PageB"].Equals(true))
+        catch
         {
-            <li>@Html.Label("PageB")</li>
+            <li>
+                <span>No Pages</span>
+            </li>
         }
-        @if (Session["PageC"].Equals(true))
-        {
-            <li>@Html.Label("PageC")</li>
-        }        
     </ul>
 }
 else

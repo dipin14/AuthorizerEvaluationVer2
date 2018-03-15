@@ -49,26 +49,41 @@ namespace AuthorizerPresentation
         {
             using (UserDbContext db = new UserDbContext())
             {
-                if (db.Users.Any(u => u.Role.roleName.ToLower() == "admin"))
+                if (db.Users.Any(u => u.Role.roleName.ToLower() == "superuser"))
                 {
                     return 0;
                 }
                 else
                 {
                     Role role = new Role();
-                    role.roleName = "admin";
+                    Role role2 = new Role();
+
+                    role.roleName = "superuser";
+                    role2.roleName = "admin";
+
                     db.Roles.Add(role);
+                    db.Roles.Add(role2);
                     db.SaveChanges();
 
-                    int adminId = role.roleId;
+                    int suId = role.roleId;
+                    int adminId = role2.roleId;
 
                     User user = new User();
-                    user.userName = "admin";
-                    user.password = "admin";
+                    user.userName = "superuser";
+                    user.password = "superuser";
                     user.firstName = "dipin";
                     user.lastName = "dinesh";
-                    user.roleId = adminId;
+                    user.roleId = suId;
+
+                    User user2 = new User();
+                    user2.userName = "admin";
+                    user2.password = "admin";
+                    user2.firstName = "peter";
+                    user2.lastName = "parker";
+                    user2.roleId = suId;
+
                     db.Users.Add(user);
+                    db.Users.Add(user2);
                     db.SaveChanges();
 
                     return 1;
