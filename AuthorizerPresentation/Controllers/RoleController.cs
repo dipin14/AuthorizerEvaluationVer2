@@ -64,7 +64,8 @@ namespace AuthorizerPresentation.Controllers
                 if (addResult == -1)
                 {
                     ModelState.AddModelError("RoleName","Rolename already exists");
-                    return View();
+                    roleViewModel = new RoleViewModel { pageDetails = PopulatePageData() };
+                    return View(roleViewModel);
                 }
                 else
                 {

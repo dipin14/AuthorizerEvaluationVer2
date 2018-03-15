@@ -123,17 +123,18 @@ namespace AuthorizerPresentation.ViewModels
                 RoleId = roleProfile.roleId,
                 RoleName = roleProfile.roleName
             };
-
-            foreach (var page in roleProfile.Pages)
+            if (roleProfile.Pages != null)
             {
-                roleViewProfile.pageDetails.Add(new PrivilegeData
+                foreach (var page in roleProfile.Pages)
                 {
-                    PageId = page.pageId,
-                    PageName = page.pageName,
-                    Access = true
-                });
+                    roleViewProfile.pageDetails.Add(new PrivilegeData
+                    {
+                        PageId = page.pageId,
+                        PageName = page.pageName,
+                        Access = true
+                    });
+                }
             }
-
             return roleViewProfile;
         }
 
