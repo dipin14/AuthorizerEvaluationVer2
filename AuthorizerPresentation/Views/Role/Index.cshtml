@@ -12,19 +12,16 @@
 <table class="table">
     <tr>
         <th>
-            @Html.DisplayNameFor(model => model.RoleId)
+            @Html.DisplayNameFor(model => model.RoleName)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.RoleName)
+            @Html.DisplayName("Privileged Pages")
         </th>
         <th></th>
     </tr>
 
 @foreach (var item in Model) {
     <tr>
-        <td>
-            @Html.DisplayFor(modelItem => item.RoleId)
-        </td>
         <td>
             @Html.DisplayFor(modelItem => item.RoleName)
         </td>

@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Common.DataTransferObjects;
 using AuthorizerDAL.Repositories;
+using AuthorizerDAL.Models;
 
 namespace AuthorizerBLL.Services
 {
@@ -18,7 +19,7 @@ namespace AuthorizerBLL.Services
             _iRoleRepository = roleRepository;
         }
 
-        public int Create(RoleDTO role)
+        public int Create(Role role)
         {
             return _iRoleRepository.Create(role);
         }
@@ -40,19 +41,38 @@ namespace AuthorizerBLL.Services
             return _iRoleRepository.GetByRoleId(id);
         }
 
-        public RoleDTO GetPagePriveleges(int roleId)
+        public PageDTO GetByPageId(int id)
         {
-            return _iRoleRepository.GetPagePriveleges(roleId);
+            return _iRoleRepository.GetByPageId(id);
         }
 
-        public IList<RoleDTO> FindAll()
+        public RoleDTO FindAndInclude(int roleId)
+        {
+            return _iRoleRepository.FindAndInclude(roleId);
+        }
+
+        public IList<RoleDTO> FindAllRoles()
         {
 
-            return _iRoleRepository.FindAll().Select(roles => new RoleDTO
+            return _iRoleRepository.FindAllRoles().Select(roles => new RoleDTO
             {
                 RoleId = roles.roleId,
                 RoleName = roles.roleName
             }).ToList(); ;
+        }
+
+        public IList<Page> FindAllPages()
+        {
+            return _iRoleRepository.FindAllPages().Select(pages => new Page
+            {                
+                pageId = pages.pageId,
+                pageName = pages.pageName
+            }).ToList(); ;
+        }
+
+        public void attachPageToPage(PageDTO page)
+        {
+            _iRoleRepository.attachPageToPage(page);
         }
     }
 }

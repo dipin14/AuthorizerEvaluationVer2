@@ -7,12 +7,24 @@
 <h2>Details</h2>
 
 <fieldset>
-    <legend>RoleViewModel</legend>
+    <legend>Role Details</legend>
 
     <div>
-        @Html.DisplayForModel(Model)
+        <table>
+            <tr>
+                <td>
+                    @Html.DisplayNameFor(model => model.RoleName)
+                </td>
 
-        <p></p>
+                <td>
+                    <b>
+                        @Html.DisplayFor(model => model.RoleName)
+                    </b>
+                </td>
+            </tr>
+        </table>
+
+        <p>Page Access Details</p>
 
         @foreach (var page in Model.pageDetails)
         {

@@ -11,7 +11,7 @@ using System.Web.Mvc;
 
 namespace AuthorizerPresentation.Controllers
 {
-    [Authorize(Roles = "admin")]
+    [Authorize(Roles = "admin,superuser")]
     public class UserController : Controller
     {
         private readonly IUserService _userService;
@@ -154,7 +154,7 @@ namespace AuthorizerPresentation.Controllers
             ViewData.Clear();
 
             //Obtaining list of roles
-            var roleList = _roleService.FindAll().ToList();
+            var roleList = _roleService.FindAllRoles().ToList();
 
             //Setting to select list for populating combo box
             return new SelectList(roleList, "roleId", "roleName");
@@ -166,7 +166,7 @@ namespace AuthorizerPresentation.Controllers
             ViewData.Clear();
 
             //Obtaining list of roles
-            var roleList = _roleService.FindAll().ToList();
+            var roleList = _roleService.FindAllRoles().ToList();
 
             return roleList.Where(r => r.RoleId == id).Select(r => r.RoleName).First();
         }

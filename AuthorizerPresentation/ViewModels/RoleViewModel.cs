@@ -13,13 +13,9 @@ namespace AuthorizerPresentation.ViewModels
     {
         int roleId;
         string roleName;
+
         public virtual ICollection<PrivilegeData> pageDetails { get; set; }
-
-        public RoleViewModel()
-        {
-            pageDetails = new Collection<PrivilegeData>();
-        }
-
+        
         public int RoleId
         {
             get
@@ -33,6 +29,7 @@ namespace AuthorizerPresentation.ViewModels
             }
         }
 
+        [Required]
         [Display(Name = "Role Name")]
         public string RoleName
         {
@@ -55,7 +52,13 @@ namespace AuthorizerPresentation.ViewModels
                 return new RoleDTO
                 {
                     RoleId = role.RoleId,
-                    RoleName = role.RoleName
+                    RoleName = role.RoleName,
+                    Pages = role.pageDetails.Select(p => new PrivilegeDTO
+                    {
+                        Access = p.Access,
+                        PageId = p.PageId,
+                        PageName = p.PageName
+                    }).ToList()
                 };
             }
             else
@@ -120,17 +123,18 @@ namespace AuthorizerPresentation.ViewModels
                 RoleId = roleProfile.roleId,
                 RoleName = roleProfile.roleName
             };
-
-            foreach (var page in roleProfile.Pages)
+            if (roleProfile.Pages != null)
             {
-                roleViewProfile.pageDetails.Add(new PrivilegeData
+                foreach (var page in roleProfile.Pages)
                 {
-                    PageId = page.pageId,
-                    PageName = page.pageName,
-                    Access = true
-                });
+                    roleViewProfile.pageDetails.Add(new PrivilegeData
+                    {
+                        PageId = page.pageId,
+                        PageName = page.pageName,
+                        Access = true
+                    });
+                }
             }
-
             return roleViewProfile;
         }
 
@@ -141,7 +145,6 @@ namespace AuthorizerPresentation.ViewModels
             roleProfile.roleName = roleProfileViewModel.RoleName;
             roleProfile.roleId = roleProfileViewModel.RoleId;
             return roleProfile;
-        }
-        
+        }        
     }
 }

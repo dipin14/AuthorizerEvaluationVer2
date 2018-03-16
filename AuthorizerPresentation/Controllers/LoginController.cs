@@ -1,7 +1,10 @@
 ﻿using AuthorizerBLL.Services;
 using AuthorizerPresentation.ViewModels;
 using Common.DataTransferObjects;
+using System.Collections.Generic;
+using System.Linq;
 using System.Security.Principal;
+using System.Text;
 using System.Web.Mvc;
 using System.Web.Security;
 
@@ -34,6 +37,7 @@ namespace AuthorizerPresentation.Controllers
                 if(loginObj != null)
                 {
                     Session["Username"] = loginObj.UserName.ToString();
+                    Session["RoleId"] = loginObj.RoleId;
                     getPriveleges(loginObj);
 
                     FormsAuthentication.SetAuthCookie(loginObj.UserName.ToString(), loginUser.RememberMe);
@@ -85,22 +89,24 @@ namespace AuthorizerPresentation.Controllers
         }
 
         /// <summary>
-        /// Gets individual page priveleges for role
+        /// Sets individual page privileges to RoleViewModel
         /// </summary>
         /// <param name="loginObj"></param>
         protected void getPriveleges(UserDTO loginObj)
         {
-            var priveleges = _roleService.GetPagePriveleges(loginObj.RoleId);
-            if (priveleges != null)
-            {
-                Session["PageA"] = true;
-                Session["PageB"] = true;
-                Session["PageC"] = true;
-            }
-            else
-            {
-                Session["PageA"] = Session["PageB"] = Session["PageC"] = false;
-            }
+            var allDbPages = _roleService.FindAllPages().ToList();
+            //db.Pages.ToList();
+
+            // Get the role we are editing and include the pages it already has access to
+            var roleProfile = _roleService.FindAndInclude(loginObj.RoleId);
+            //var roleProfile = db.Roles.Include("Pages").FirstOrDefault(x => x.roleId == id);
+
+            RoleViewModel roleViewModel = new RoleViewModel();
+            roleViewModel = roleViewModel.ToViewModel(roleProfile, allDbPages);
+
+            var pages = roleViewModel.pageDetails.Where(p => p.Access).Select(p => p.PageName).ToList();
+            
+            Session["Pages"] = pages;    
         }
     }
 }

@@ -41,8 +41,18 @@ namespace AuthorizerDAL.Repositories
                     using (var db = new UserDbContext())
                     {
                         var roleProfile = db.Roles.Include("Pages").Single(r => r.roleId == id);
-                        DeleteRole(roleProfile);
-                    }                    
+
+                        if (roleProfile.Pages != null)
+                        {
+                            foreach (var page in roleProfile.Pages.ToList())
+                            {
+                                roleProfile.Pages.Remove(page);
+                            }
+                        }
+                        db.Roles.Remove(roleProfile);
+                        db.Entry(roleProfile).State = EntityState.Deleted;
+                        db.SaveChanges();
+                    }
                     return 1;
                 }
                 return 0;
@@ -53,7 +63,7 @@ namespace AuthorizerDAL.Repositories
             }
         }
         
-        public IList<Role> FindAll()
+        public IList<Role> FindAllRoles()
         {
             IList<Role> roleList;
             using (var db = new UserDbContext())
@@ -62,16 +72,24 @@ namespace AuthorizerDAL.Repositories
             }
             return roleList;
         }
-                
+
+        public IList<Page> FindAllPages()
+        {
+            IList<Page> pageList;
+            using (var db = new UserDbContext())
+            {
+                pageList = db.Pages.ToList();
+            }
+            return pageList;
+        }
+
         public Role GetByRoleId(int? id)
         {
             IQueryable<Role> roleProfileIQueryable;
-            using (var db = new UserDbContext())
-            {
-                roleProfileIQueryable = from r in db.Roles.Include("Pages")
-                                            where r.roleId == id
-                                            select r;
-            }
+            UserDbContext db = new UserDbContext();
+            roleProfileIQueryable = from r in db.Roles.Include("Pages")
+                                    where r.roleId == id
+                                    select r;
 
             if (!roleProfileIQueryable.Any())
             {
@@ -81,6 +99,15 @@ namespace AuthorizerDAL.Repositories
             var roleProfile = roleProfileIQueryable.First();
 
             return roleProfile;
+        }
+
+        public Page GetByPageId(int id)
+        {
+            using (var db = new UserDbContext())
+            {
+                var page = db.Pages.Find(id);
+                return page;
+            }
         }
 
         private void DeleteRole(Role roleProfile)
@@ -96,6 +123,28 @@ namespace AuthorizerDAL.Repositories
             {
                 db.Roles.Remove(roleProfile);
                 db.SaveChanges();
+            }
+        }
+
+        public int Update(Role role)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void attachPageToPage(Page page)
+        {
+            using (var db = new UserDbContext())
+            {
+                db.Pages.Attach(page);
+            }
+        }
+
+        public Role FindAndInclude(int roleId)
+        {
+            using (var db = new UserDbContext())
+            {
+                var roleProfile = db.Roles.Include("Pages").FirstOrDefault(x => x.roleId == roleId);
+                return roleProfile;
             }
         }
     }

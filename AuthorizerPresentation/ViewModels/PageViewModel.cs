@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Common.DataTransferObjects;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -34,6 +35,22 @@ namespace AuthorizerPresentation.ViewModels
             set
             {
                 pageDescription = value;
+            }
+        }
+
+        public static implicit operator PageDTO(PageViewModel page)
+        {
+            if (page != null)
+            {
+                return new PageDTO
+                {
+                    PageId = page.PageId,
+                    PageName = page.PageDescription
+                };
+            }
+            else
+            {
+                return null;
             }
         }
     }

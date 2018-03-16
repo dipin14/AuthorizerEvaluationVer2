@@ -1,4 +1,5 @@
-﻿using Common.DataTransferObjects;
+﻿using AuthorizerDAL.Models;
+using Common.DataTransferObjects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,7 +15,7 @@ namespace AuthorizerBLL.Services
         /// </summary>
         /// <param name="role"></param>
         /// <returns></returns>
-        int Create(RoleDTO role);
+        int Create(Role role);
 
         /// <summary>
         /// Update existing role model
@@ -34,8 +35,20 @@ namespace AuthorizerBLL.Services
         /// List all roles
         /// </summary>
         /// <returns></returns>
-        IList<RoleDTO> FindAll();
+        IList<RoleDTO> FindAllRoles();
 
-        RoleDTO GetByRoleId(int? id)
+        /// <summary>
+        /// List all pages
+        /// </summary>
+        /// <returns></returns>
+        IList<Page> FindAllPages();
+
+        RoleDTO GetByRoleId(int? id);
+
+        PageDTO GetByPageId(int id);
+
+        void attachPageToPage(PageDTO page);
+
+        RoleDTO FindAndInclude(int roleId);
     }
 }

@@ -11,7 +11,7 @@ namespace Common.DataTransferObjects
     {
         int roleId;
         string roleName;
-        public virtual ICollection<Page> Pages { get; set; }
+        public virtual ICollection<PrivilegeDTO> Pages { get; set; }
 
         public int RoleId
         {
@@ -50,7 +50,12 @@ namespace Common.DataTransferObjects
                 return new Role
                 {
                     roleId = roleDto.RoleId,
-                    roleName = roleDto.RoleName
+                    roleName = roleDto.RoleName,
+                    Pages = roleDto.Pages.Select(p => new Page
+                    {
+                        pageId = p.PageId,
+                        pageName = p.PageName
+                    }).ToList()
                 };
             }
             else
@@ -70,7 +75,12 @@ namespace Common.DataTransferObjects
                 return new RoleDTO
                 {
                     roleId = role.roleId,
-                    roleName = role.roleName
+                    roleName = role.roleName,
+                    Pages = role.Pages.Select(p => new PrivilegeDTO
+                    {
+                        PageId = p.pageId,
+                        PageName = p.pageName
+                    }).ToList()
                 };
             }
             else
