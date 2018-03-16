@@ -47,11 +47,14 @@
                     @Html.DisplayFor(modelItem => item.RoleName)
                 </td>
                 <td>
-                    @Html.ActionLink("Edit", "Edit", new { username = item.UserName }, new { @style = "color:green" }) |
-                    @Html.ActionLink("Delete", "Delete", new { username = item.UserName }, new { @style = "color:red" })
+                    @if (item.RoleName != "superuser")
+                    {
+                        @Html.ActionLink("Edit |", "Edit", new { username = item.UserName }, new { @style = "color:green" })
+                        @Html.ActionLink(" Delete", "Delete", new { username = item.UserName }, new { @style = "color:red" })
+                    }
                 </td>
             </tr>
         </tbody>
-    }
+    } 
 
 </table>

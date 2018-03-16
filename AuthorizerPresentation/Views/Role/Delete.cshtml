@@ -19,6 +19,9 @@ else
 {
     <h3>Are you sure you want to delete this role?</h3>
     <div>
+        <div style="color: red">
+            NOTE : Deleting @Html.DisplayFor(model => model.RoleName) will delete all users that are @Html.DisplayFor(model => model.RoleName) (s)
+        </div>
         <h4>Role Details</h4>
         <hr />
         <dl class="dl-horizontal">
@@ -36,7 +39,7 @@ else
             @Html.AntiForgeryToken()
 
             <div class="form-actions no-color">
-                <input type="submit" value="Delete" class="btn btn-default" /> |
+                <input type="submit" value="Delete" class="btn btn-danger" /> |
                 @Html.ActionLink("Back to List", "Index")
             </div>
         }

@@ -51,7 +51,7 @@ namespace AuthorizerPresentation.Controllers
         //Create a new user
         public ActionResult Create()
         {
-            ViewData["Roles"] = FetchRoles();
+            loadRolesDropDown();
             return View();
         }
         [HttpPost]
@@ -59,9 +59,7 @@ namespace AuthorizerPresentation.Controllers
         {
             if (userView != null)
             {
-                //Refreshes roles to DropDown on the case that duplicate username error occurs
-                ViewData["Roles"] = FetchRoles();
-
+                loadRolesDropDown();
                 userView.FirstName.Trim();
                 var userCreateResult = _userService.Create(userView);
 
@@ -94,7 +92,7 @@ namespace AuthorizerPresentation.Controllers
             {
                 return HttpNotFound();
             }
-            ViewData["Roles"] = FetchRoles();
+            loadRolesDropDown();
             return View(userCollection);
         }
 
@@ -143,7 +141,7 @@ namespace AuthorizerPresentation.Controllers
         }
 
         /// <summary>
-        /// Fetches list of all roles and saves to ViewData["Roles"]
+        /// Fetches list of all roles from db
         /// </summary>
         private SelectList FetchRoles()
         {
@@ -156,7 +154,11 @@ namespace AuthorizerPresentation.Controllers
             return new SelectList(roleList, "roleId", "roleName");
         }
 
-        //Fetches role based on id
+        /// <summary>
+        /// Fetches role based on id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         private string FetchRoles(int id)
         {
             ViewData.Clear();
@@ -165,6 +167,21 @@ namespace AuthorizerPresentation.Controllers
             var roleList = _roleService.FindAllRoles().ToList();
 
             return roleList.Where(r => r.RoleId == id).Select(r => r.RoleName).First();
+        }
+
+        /// <summary>
+        /// Sets List of roles to limit showing superuser unless user is superuser
+        /// </summary>
+        private void loadRolesDropDown()
+        {
+            if (!User.IsInRole("superuser"))
+            {
+                ViewData["Roles"] = new SelectList(FetchRoles().Where(r => r.Text != "superuser").ToList(), "Value", "Text");
+            }
+            else
+            {
+                ViewData["Roles"] = FetchRoles();
+            }
         }
     }
 }
