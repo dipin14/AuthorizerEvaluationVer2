@@ -1,9 +1,5 @@
 ﻿using AuthorizerDAL.Models;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace AuthorizerDAL.Repositories
 {
@@ -43,10 +39,24 @@ namespace AuthorizerDAL.Repositories
         /// <returns></returns>
         IList<Page> FindAllPages();
 
-        Role GetByRoleId(int? id);
+        /// <summary>
+        /// Get role details using role id
+        /// </summary>
+        /// <param name="roleId"></param>
+        /// <returns></returns>
+        Role GetByRoleId(int? roleId);
 
-        Page GetByPageId(int id);
+        /// <summary>
+        /// Get page details using page id
+        /// </summary>
+        /// <param name="pageId"></param>
+        /// <returns></returns>
+        Page GetByPageId(int pageId);
 
+        /// <summary>
+        /// Attach page model to entity
+        /// </summary>
+        /// <param name="page"></param>
         void attachPageToPage(Page page);
 
         /// <summary>

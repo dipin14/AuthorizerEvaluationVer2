@@ -1,10 +1,6 @@
 ﻿using AuthorizerDAL.Models;
 using Common.DataTransferObjects;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace AuthorizerBLL.Services
 {
@@ -43,12 +39,31 @@ namespace AuthorizerBLL.Services
         /// <returns></returns>
         IList<Page> FindAllPages();
 
+        /// <summary>
+        /// Get role details using role id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         RoleDTO GetByRoleId(int? id);
 
+        /// <summary>
+        /// Get page details using page id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         PageDTO GetByPageId(int id);
 
+        /// <summary>
+        /// Attach Page model eith page entity
+        /// </summary>
+        /// <param name="page"></param>
         void attachPageToPage(PageDTO page);
 
+        /// <summary>
+        /// Retrive role details along with privileged pages
+        /// </summary>
+        /// <param name="roleId"></param>
+        /// <returns></returns>
         RoleDTO FindAndInclude(int roleId);
     }
 }

@@ -14,6 +14,7 @@ namespace AuthorizerDAL.DatabaseContext
             modelBuilder.HasDefaultSchema("public");
             base.OnModelCreating(modelBuilder);
 
+            //Fluent API that shows many to many relations
             modelBuilder.Entity<Role>()
     .HasMany(rol => rol.Pages)
     .WithMany(page => page.Roles)

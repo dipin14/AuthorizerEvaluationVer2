@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using AuthorizerDAL.Models;
 using AuthorizerDAL.DatabaseContext;
 using System.Data.Entity;
@@ -40,6 +38,7 @@ namespace AuthorizerDAL.Repositories
                 {
                     using (var db = new UserDbContext())
                     {
+                        //Remove pages linked with to be deleted role
                         var roleProfile = db.Roles.Include("Pages").Single(r => r.roleId == id);
 
                         if (roleProfile.Pages != null)

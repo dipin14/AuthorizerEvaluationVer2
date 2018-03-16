@@ -59,3 +59,13 @@ C:\Users\Exp\Documents\Visual Studio 2015\Projects\AuthorizationProjectFinalVer4
 C:\Users\Exp\Documents\Visual Studio 2015\Projects\AuthorizationProjectFinalVer4\AuthorizerEvaluationVer2\Common\bin\Debug\EntityFramework.dll
 C:\Users\Exp\Documents\Visual Studio 2015\Projects\AuthorizationProjectFinalVer4\AuthorizerEvaluationVer2\Common\bin\Debug\AuthorizerDAL.pdb
 C:\Users\Exp\Documents\Visual Studio 2015\Projects\AuthorizationProjectFinalVer4\AuthorizerEvaluationVer2\Common\bin\Debug\EntityFramework.xml
+C:\Users\Exp\Documents\AuthorizerEvaluationVer2\Common\bin\Debug\Common.dll.config
+C:\Users\Exp\Documents\AuthorizerEvaluationVer2\Common\bin\Debug\Common.dll
+C:\Users\Exp\Documents\AuthorizerEvaluationVer2\Common\bin\Debug\Common.pdb
+C:\Users\Exp\Documents\AuthorizerEvaluationVer2\Common\bin\Debug\AuthorizerDAL.dll
+C:\Users\Exp\Documents\AuthorizerEvaluationVer2\Common\bin\Debug\EntityFramework.dll
+C:\Users\Exp\Documents\AuthorizerEvaluationVer2\Common\bin\Debug\AuthorizerDAL.pdb
+C:\Users\Exp\Documents\AuthorizerEvaluationVer2\Common\bin\Debug\EntityFramework.xml
+C:\Users\Exp\Documents\AuthorizerEvaluationVer2\Common\obj\Debug\Common.csprojResolveAssemblyReference.cache
+C:\Users\Exp\Documents\AuthorizerEvaluationVer2\Common\obj\Debug\Common.dll
+C:\Users\Exp\Documents\AuthorizerEvaluationVer2\Common\obj\Debug\Common.pdb

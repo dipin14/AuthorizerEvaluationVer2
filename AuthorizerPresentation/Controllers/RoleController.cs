@@ -5,7 +5,6 @@ using AuthorizerPresentation.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using System.Web.Mvc;
 
 namespace AuthorizerPresentation.Controllers
@@ -25,6 +24,17 @@ namespace AuthorizerPresentation.Controllers
         public ActionResult Index()
         {
             var roleProfiles = db.Roles.ToList();
+
+            //Admin should not be able to view superuser details
+            if(User.IsInRole("admin"))
+            {
+                var superUser = roleProfiles.Where(r => r.roleName == "superuser").FirstOrDefault();
+                roleProfiles.Remove(superUser);
+                var adminUser = roleProfiles.Where(r => r.roleName == "admin").FirstOrDefault();
+                roleProfiles.Remove(adminUser);
+            }
+
+            //Mapping RolesDTO to RoleViewModels
             var roleViewModels = roleProfiles.Select(roleProfile => new RoleViewModel()
             {
                 RoleId = roleProfile.roleId,
@@ -92,26 +102,48 @@ namespace AuthorizerPresentation.Controllers
         [HttpPost]
         public ActionResult Edit(RoleViewModel roleProfileViewModel)
         {
-            if (ModelState.IsValid)
+            try
             {
-
-                var originalRoleProfile = db.Roles.Find(roleProfileViewModel.RoleId);
-
-                var editResult = AddOrUpdatePages(originalRoleProfile, roleProfileViewModel.pageDetails);
-
-                if (editResult == -1)
+                if (ModelState.IsValid)
                 {
-                    ModelState.AddModelError("RoleName", "Rolename already exists");
-                    return View();
-                }
-                else
-                {
-                    db.Entry(originalRoleProfile).CurrentValues.SetValues(roleProfileViewModel);
-                    db.SaveChanges();
-                    return RedirectToAction("Index");
+
+                    var originalRoleProfile = db.Roles.Find(roleProfileViewModel.RoleId);
+
+                    var editResult = AddOrUpdatePages(originalRoleProfile, roleProfileViewModel.pageDetails);
+
+                    if (editResult == -1)
+                    {
+                        ModelState.AddModelError("RoleName", "Rolename already exists");
+                        return View();
+                    }
+                    else
+                    {
+                        //Updating values of role page privileges
+                        db.Entry(originalRoleProfile).CurrentValues.SetValues(roleProfileViewModel);
+                        //Updating rolename seperately due to change in property names
+                        db.Entry(originalRoleProfile).Property(p => p.roleName).CurrentValue = roleProfileViewModel.RoleName;
+                        db.SaveChanges();
+                        return RedirectToAction("Index");
+                    }
                 }
             }
+            //Exception arises when duplicate role name is entered in edit field
+            //Reloading page privileges details is necessary
+            catch(Exception)
+            {
+                ModelState.AddModelError("RoleName", "Rolename already exists");
 
+                // Get all pages
+                var allDbPages = _roleService.FindAllPages().ToList();
+
+                // Get the role we are editing and include the pages it already has access to
+                var roleProfile = _roleService.FindAndInclude(roleProfileViewModel.RoleId);
+
+                RoleViewModel roleViewModel = new RoleViewModel();
+                roleViewModel = roleViewModel.ToViewModel(roleProfile, allDbPages);
+
+                return View(roleViewModel);
+            }
             return View(roleProfileViewModel);
         }
 
@@ -157,6 +189,12 @@ namespace AuthorizerPresentation.Controllers
             return RedirectToAction("Index");
         }
 
+        /// <summary>
+        /// Adds or Updates rolename and access privileges for passed role
+        /// </summary>
+        /// <param name="roleProfile"></param>
+        /// <param name="privilegeAccessed"></param>
+        /// <returns></returns>
         private int AddOrUpdatePages(Role roleProfile, IEnumerable<PrivilegeData> privilegeAccessed)
         {
             try
@@ -206,7 +244,10 @@ namespace AuthorizerPresentation.Controllers
             }
         }
 
-        //Populates viewmodel with page values
+        /// <summary>
+        /// Populates viewmodel with page values
+        /// </summary>
+        /// <returns></returns>
         private ICollection<PrivilegeData> PopulatePageData()
         {
             UserDbContext entities = new UserDbContext();
@@ -214,6 +255,7 @@ namespace AuthorizerPresentation.Controllers
             try
             {
                 var accessiblePrivileges = new List<PrivilegeData>();
+
                 //Admin has privileges of only those pages assigned by superuser
                 if (User.IsInRole("admin"))
                 {

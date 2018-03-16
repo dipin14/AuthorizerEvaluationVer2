@@ -2,14 +2,12 @@
 using AuthorizerDAL.DatabaseContext;
 using AuthorizerDAL.Models;
 using AuthorizerDAL.Repositories;
-using AuthorizerPresentation.ViewModels;
+using AuthorizerPresentation.App_Start;
 using Autofac;
 using Autofac.Integration.Mvc;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
 using System.Web.Security;
@@ -55,37 +53,41 @@ namespace AuthorizerPresentation
                 }
                 else
                 {
-                    Role role = new Role();
-                    Role role2 = new Role();
+                    //Creating default superuser role
+                    Role suRole = new Role();
+                    suRole.roleName = "superuser";
+                    db.Roles.Add(suRole);             
+                    int suId = suRole.roleId;                    
 
-                    role.roleName = "superuser";
-                    role2.roleName = "admin";
-
-                    db.Roles.Add(role);
-                    db.Roles.Add(role2);
+                    //Creating default superuser user credentials
+                    User suUser = new User();
+                    suUser.userName = "superuser";
+                    suUser.password = "superuser";
+                    suUser.firstName = "dipin";
+                    suUser.lastName = "dinesh";
+                    suUser.roleId = suId;
+                    db.Users.Add(suUser);
                     db.SaveChanges();
 
-                    int suId = role.roleId;
-                    int adminId = role2.roleId;
+                    if (db.Users.Any(u => u.Role.roleName.ToLower() == "admin"))
+                    {
+                        //Creating default admin role
+                        Role adminRole = new Role();
+                        adminRole.roleName = "admin";
+                        db.Roles.Add(adminRole);
+                        int adminId = adminRole.roleId;
 
-                    User user = new User();
-                    user.userName = "superuser";
-                    user.password = "superuser";
-                    user.firstName = "dipin";
-                    user.lastName = "dinesh";
-                    user.roleId = suId;
+                        //Creating default admin user credentials
+                        User adminUser = new User();
+                        adminUser.userName = "admin";
+                        adminUser.password = "admin";
+                        adminUser.firstName = "peter";
+                        adminUser.lastName = "parker";
+                        adminUser.roleId = suId;
 
-                    User user2 = new User();
-                    user2.userName = "admin";
-                    user2.password = "admin";
-                    user2.firstName = "peter";
-                    user2.lastName = "parker";
-                    user2.roleId = suId;
-
-                    db.Users.Add(user);
-                    db.Users.Add(user2);
-                    db.SaveChanges();
-
+                        db.Users.Add(adminUser);
+                        db.SaveChanges();
+                    }
                     return 1;
                 }
             }
@@ -131,17 +133,25 @@ namespace AuthorizerPresentation
 
         public void MockPagesInitializer()
         {
+                        
             Page pageA = new Page { pageId = 1, pageName = "MockPage A" };
             Page pageB = new Page { pageId = 2, pageName = "MockPage B" };
             Page pageC = new Page { pageId = 3, pageName = "MockPage C" };
             using (UserDbContext entities = new UserDbContext())
             {
-                entities.Pages.Add(pageA);
-                entities.Pages.Add(pageB);
-                entities.Pages.Add(pageC);
-            }                            
-        }
-
-        
+                var set = entities.Set<Page>();
+                if (set.Any())
+                {
+                    return;
+                }
+                else
+                {
+                    entities.Pages.Add(pageA);
+                    entities.Pages.Add(pageB);
+                    entities.Pages.Add(pageC);
+                    entities.SaveChanges();
+                }
+            }                          
+        }  
     }
 }

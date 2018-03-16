@@ -1,10 +1,8 @@
 ﻿using AuthorizerBLL.Services;
 using AuthorizerPresentation.ViewModels;
 using Common.DataTransferObjects;
-using System.Collections.Generic;
 using System.Linq;
 using System.Security.Principal;
-using System.Text;
 using System.Web.Mvc;
 using System.Web.Security;
 
@@ -95,11 +93,9 @@ namespace AuthorizerPresentation.Controllers
         protected void getPriveleges(UserDTO loginObj)
         {
             var allDbPages = _roleService.FindAllPages().ToList();
-            //db.Pages.ToList();
 
             // Get the role we are editing and include the pages it already has access to
             var roleProfile = _roleService.FindAndInclude(loginObj.RoleId);
-            //var roleProfile = db.Roles.Include("Pages").FirstOrDefault(x => x.roleId == id);
 
             RoleViewModel roleViewModel = new RoleViewModel();
             roleViewModel = roleViewModel.ToViewModel(roleProfile, allDbPages);
